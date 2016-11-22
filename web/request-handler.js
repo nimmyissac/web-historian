@@ -2,51 +2,38 @@ var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var fs = require('fs');
 var url = require('url');
+var querystring = require('querystring');
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
- if (req.url.length === 1  && req.method === 'GET') {
-     fs.readFile((archive.paths.siteAssets+'/'+'index.html'),'utf8', function (err, html) {
-       if (err) {
-         console.log("Error");
-        throw err;
-       }       
-       res.writeHeader(200, {'Content-Type': 'text/html'});  
-      res.end(html); 
-    });
-  } 
-   else if(req.method === 'GET' && req.url.length > 1) {
-     var data = fs.readFile((archive.paths.archivedSites+req.url), 'utf8', function(err, html) {
+
+  if (req.method === 'GET') {
+    if (req.url.length === 1 ) {
+      fs.readFile((archive.paths.siteAssets + '/' + 'index.html'), 'utf8', function (err, html) {
         if (err) {
-          res.writeHeader(404); 
-          res.end();
+          throw err;
         }       
-        res.writeHeader(200, {'Content-Type': 'text/html'});  
+        res.writeHead(200, req.headers);  
+        res.end(html.toString()); 
+      });
+    } else {
+      fs.readFile((archive.paths.archivedSites + req.url), 'utf8', function(err, html) {
+        if (err) {
+          res.writeHead(404); 
+          res.end();
+        }        
+        res.writeHead(200, {'Content-Type': 'text/html'});  
         res.end(html); 
-    });
-     
-   }
-   else if(req.method === 'POST' ) {
-    var fileTobeAppended ;
-     if(req.url.match(/[a-z.]+/) !== null ){
-       fileTobeAppended = req.url.match(/[a-z.]+/).join('');
-     } else {
-       fileTobeAppended ="";
-     }
-     fs.appendFile(archive.paths.list, fileTobeAppended, (err) => {
-      if (err) {
-        console.log("Error ", err);
-        throw err;
-      }
-      console.log("appended ",fileTobeAppended);
-    });
+      });
+    } 
+      
+  } else if (req.method === 'POST' ) {
+    archive.addUrlToList(req.url);
+    res.writeHead(302);
+    res.end();
+  } else {
+    res.end(archive.paths.list);
   }
-   else{
-     res.end(archive.paths.list);
-  }
-  
-
-
 };
 
 
