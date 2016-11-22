@@ -33,6 +33,7 @@ describe('server', function() {
 
         // Create or clear the file.
         var fd = fs.openSync(fixturePath, 'w');
+        //console.log("inside test",path.dirname(fixturePath))
         fs.writeSync(fd, 'google');
         fs.closeSync(fd);
 

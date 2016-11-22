@@ -25,7 +25,8 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(url) {
+   
 
 };
 
@@ -33,12 +34,24 @@ exports.isUrlInList = function() {
 };
 
 exports.addUrlToList = function() {
+  
 };
 
 exports.isUrlArchived = function(url) {
+ var isArchived = false;
+ fs.readdir(exports.paths.archivedSites,'utf8',(err, files) => {
+   files.forEach(file => {
+     url = url.match(/[a-z.]+/).join('');
+     if(file === url) {
+       isArchived = true;
+       console.log("isArchived"+isArchived);
+     }
+   });
+ });
+ console.log("return value = ",isArchived);
+ return isArchived;
   
 };
 
 exports.downloadUrls = function() {
 };
-arr.join(',');
