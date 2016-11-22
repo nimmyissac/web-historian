@@ -26,6 +26,7 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function() {
+
 };
 
 exports.isUrlInList = function() {
@@ -34,8 +35,10 @@ exports.isUrlInList = function() {
 exports.addUrlToList = function() {
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url) {
+  
 };
 
 exports.downloadUrls = function() {
 };
+arr.join(',');
