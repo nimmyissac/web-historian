@@ -29,9 +29,15 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(url) {
-   
-
+exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, 'utf8', (err, data) => {
+   if (err) {
+      throw err;
+    }
+    var urls = data.split('\n');
+    callback(urls);
+  });
+  
 };
 
 exports.isUrlInList = function(url, callback) {
@@ -40,7 +46,7 @@ exports.isUrlInList = function(url, callback) {
       throw err;
     }
     var urlArray = data.split('\n');
-    console.log("url Array "+urlArray);
+    //console.log("url Array "+urlArray);
     var urlPresent = false;
     _.each(urlArray, function(element) {
       if ( element === url ) {
@@ -52,18 +58,12 @@ exports.isUrlInList = function(url, callback) {
 
 };
 
-// fs.appendFile('message.txt', 'data to append', (err) => {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log('The "data to append" was appended to file!');
-// });
-
 exports.addUrlToList = function(url, callback) {
   var keys = Object.keys(querystring.parse( url ));
   url = keys[0];
   fs.appendFile(exports.paths.list, url + '\n', function(err) {
     if (err) {
+      console.log("Error ", err);
       throw err;
     }
     callback(); // this is just to make the test pass
@@ -71,32 +71,37 @@ exports.addUrlToList = function(url, callback) {
 };
 
 
-exports.isUrlArchived = function(url, callback, done) {
-  // console.log("Callback is ");
-  // console.log("directory is ");
-  // console.log(exports.paths.archivedSites);
-  //console.log(keys[0]);
-  // fs.readdir(exports.paths.archivedSites,'utf8', (err, files) => {
-  //   // console.log("Entering readdir ");
+exports.isUrlArchived = function(url, callback) {
+  //check if url is archived
+  //call callback with the result; 
+  fs.readdir(exports.paths.archivedSites, function(err, items) {
+    var isArchived = false;
+    if (err) {
+      throw err;
+    }
+    for (var i=0; i<items.length; i++) {
+      if( items[i] === url ) {
+        isArchived = true;
+      }
+    }
+    callback(isArchived);
+  });
+
     
-  //   var keys = Object.keys(querystring.parse( url ));
-  //   url = keys[0];
-  //   var isArchived = false;
-  //   files.forEach(file => {
-  //     // console.log("File is "+file);
-  //     //url = url.match(/[a-z.]+/).join('');
-  //     if (file === url) {
-  //       isArchived = true;
-  //       // console.log("isArchived"+isArchived);
-  //     }
-  //   });
-  //   // console.log("calling callback with "+isArchived);
-  //   callback(isArchived);
-  // });
- 
+};
+
+
+exports.downloadUrls = function(urlArray) {
+  var array = urlArray.slice();
+  var download = function(url){
+    fs.writeFile(exports.paths.archivedSites + '/'+url, 'contents', function() {
+    var shiftedElement = array.shift();
+    if(array.length === 0){
+     return;
+    }
+    download(array[0]);
+   });
+ }
+ download(array[0]);
+};
   
-};
-
-
-exports.downloadUrls = function() {
-};

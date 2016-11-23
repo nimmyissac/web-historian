@@ -27,24 +27,22 @@ exports.handleRequest = function (req, res) {
       });
     } 
       
-  } else if (req.method === 'POST' ) {
-    archive.addUrlToList(req.url);
-    res.writeHead(302);
-    res.end();
+  } else if (req.method === 'POST' && req.url.length === 1) {
+    var message ='';
+    req.on('data', (chunks) => {
+      message += chunks;
+    });
+
+    res.writeHead(302, {'Content-Type': 'text/html'}); 
+    req.on('end', function () {
+      var url = message.substring(message.indexOf('=')+1)
+      archive.addUrlToList(url, function() {
+       res.end();
+      });
+    });
+  
   } else {
     res.end(archive.paths.list);
   }
 };
 
-
-// archive.paths.archivedSites+request.url
-//console.log(url.parse(req.url)); returns the domain address
- // fs.readFile(request.url,'utf8', function (err, html) {
- //      if (err) {
- //        // load loading.html
- //      }       
- //      console.log((html));
- //      // res.writeHeader(200, {'Content-Type': 'text/html'});  
- //      // res.write(html);  
- //      // res.end(); 
- //    });
